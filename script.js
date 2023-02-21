@@ -8,10 +8,23 @@ const movieSales = "https://cdn.freecodecamp.org/testable-projects-fcc/data/tree
 const videoGameSales =
   "https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/video-game-sales-data.json";
 
+//Dimensions and important data
+const w = window.screen.availWidth - 200;
+const h = 750;
+const margin = { top: 20, bottom: 20, left: 40, right: 40 };
+const innerWidth = w - margin.left - margin.right;
+const innerHeight = h - margin.top - margin.bottom;
+
+const svg = d3
+  .select("#graph")
+  .append("svg")
+  .attr("width", w)
+  .attr("height", h)
+
 const draw = (data) => {
   const [kickstarter, movies, games] = data;
 
-  console.log("KickStart:", kickstarter, "Movies:", movies, "Games:", games)
+  console.log("KickStart:", kickstarter, "Movies:", movies, "Games:", games);
 };
 
 //Simple helper method to don't repeat yourself
