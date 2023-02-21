@@ -11,7 +11,7 @@ const videoGameSales =
 const draw = (data) => {
   const [kickstarter, movies, games] = data;
 
-  console.log(kickstarter, movies, games)
+  console.log("KickStart:", kickstarter, "Movies:", movies, "Games:", games)
 };
 
 //Simple helper method to don't repeat yourself
