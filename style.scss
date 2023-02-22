@@ -30,3 +30,15 @@ header {
     width: 1720px;
     margin: 10px auto 0px auto;
 }
+
+#tooltip {
+  position: absolute;
+  background-color: black;
+  color: whitesmoke;
+  padding: 10px 15px;
+  pointer-events: none;
+  border-radius: 5px;
+  opacity: 0;
+  transition: opacity 250ms ease-out;
+  line-height: 1.5;
+}

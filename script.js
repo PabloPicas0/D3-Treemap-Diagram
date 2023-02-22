@@ -25,9 +25,32 @@ const conatainer = svg
 const draw = (data) => {
   const [kickstarter, movies, games] = data;
 
-  const hierarchy = d3.hierarchy(games).sum((d) => {
-    return d.value;
-  }).sort((a, b) => b.value - a.value); //Compute size of each rectangle from given value
+  const onMouseMove = (event) => {
+    const tooltip = d3.select("#tooltip");
+
+    //Data for tooltip
+    const { name, category, value } = event.target.__data__.data;
+
+    tooltip
+      .style("left", `${event.clientX + 10}px`)
+      .style("top", `${event.clientY - 90}px`)
+      .style("opacity", 0.9)
+      .attr("data-value", value)
+      .html(`Name: ${name} <br> Category: ${category} <br> Value: ${value}`);
+  };
+
+  const onMouseOut = () => {
+    const tooltip = d3.select("#tooltip");
+
+    tooltip.style("opacity", 0)
+  }
+
+  const hierarchy = d3
+    .hierarchy(games)
+    .sum((d) => {
+      return d.value;
+    })
+    .sort((a, b) => b.value - a.value); //Compute size of each rectangle from given value
 
   //Create a new tree map
   const tree = d3.treemap().size([innerWidth, innerHeight]).padding(1);
@@ -35,21 +58,33 @@ const draw = (data) => {
   //compute position of each element of the hierarchy
   const root = tree(hierarchy);
 
-  conatainer
-    .selectAll("g")
-    .data(root.leaves())
-    .enter()
-    .append("g")
-    .attr("class", "group")
+  //G element for each rectangle
+  const group = conatainer.selectAll("g").data(root.leaves()).enter().append("g").attr("class", "group");
+
+  group
     .append("rect")
+    .on("mousemove", onMouseMove)
+    .on("mouseout", onMouseOut)
     .attr("class", "tile")
     .attr("x", (d) => d.x0)
     .attr("y", (d) => d.y0)
+    .attr("data-value", (d) => d.data.value)
+    .attr("data-name", (d) => d.data.name)
+    .attr("data-category", (d) => d.data.category)
     .attr("width", (d) => d.x1 - d.x0)
     .attr("height", (d) => d.y1 - d.y0)
     .attr("fill", "navy");
 
-  console.log("KickStart:", kickstarter, "Movies:", movies, "Games:", games, root);
+  group
+    .append("text")
+    .attr("x", (d) => d.x0 + 5)
+    .attr("y", (d) => d.y0 + 20)
+    .attr("fill", "white")
+    .attr("font-size", 10)
+    .append("tspan")
+    .text((d) => d.data.name);
+
+  console.log("KickStart:", kickstarter, "Movies:", movies, "Games:", games);
 };
 
 //Simple helper method to don't repeat yourself
@@ -62,3 +97,9 @@ Promise.all([
   fetch(movieSales).then(response),
   fetch(videoGameSales).then(response),
 ]).then((data) => draw(data));
+
+//TODO:
+//Add legend
+//Add colored cells
+//Add switch between data
+//Add animation between data switching
