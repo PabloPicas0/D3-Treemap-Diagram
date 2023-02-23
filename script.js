@@ -42,8 +42,8 @@ const draw = (data) => {
   const onMouseOut = () => {
     const tooltip = d3.select("#tooltip");
 
-    tooltip.style("opacity", 0)
-  }
+    tooltip.style("opacity", 0);
+  };
 
   const hierarchy = d3
     .hierarchy(games)
@@ -59,15 +59,22 @@ const draw = (data) => {
   const root = tree(hierarchy);
 
   //G element for each rectangle
-  const group = conatainer.selectAll("g").data(root.leaves()).enter().append("g").attr("class", "group");
+  const cell = conatainer
+    .selectAll("g")
+    .data(root.leaves())
+    .enter()
+    .append("g")
+    .attr("class", "cell")
+    .attr("transform", (d) => {
+      return `translate(${d.x0}, ${d.y0})`;
+    });
 
-  group
+  //Cell elements
+  cell
     .append("rect")
     .on("mousemove", onMouseMove)
     .on("mouseout", onMouseOut)
     .attr("class", "tile")
-    .attr("x", (d) => d.x0)
-    .attr("y", (d) => d.y0)
     .attr("data-value", (d) => d.data.value)
     .attr("data-name", (d) => d.data.name)
     .attr("data-category", (d) => d.data.category)
@@ -75,14 +82,21 @@ const draw = (data) => {
     .attr("height", (d) => d.y1 - d.y0)
     .attr("fill", "navy");
 
-  group
+  //Text elements
+  cell
     .append("text")
-    .attr("x", (d) => d.x0 + 5)
-    .attr("y", (d) => d.y0 + 20)
     .attr("fill", "white")
     .attr("font-size", 10)
+    .style("pointer-events", "none")
+    .selectAll("tspan")
+    .data((d) => d.data.name.split(/(?=[A-Z][^A-Z])/g))
+    .enter()
     .append("tspan")
-    .text((d) => d.data.name);
+    .attr("x", 4)
+    .attr("y", (d, i) => {
+      return 10 + i * 10;
+    })
+    .text((d) => d);
 
   console.log("KickStart:", kickstarter, "Movies:", movies, "Games:", games);
 };
