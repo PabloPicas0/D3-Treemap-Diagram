@@ -42,3 +42,7 @@ header {
   transition: opacity 250ms ease-out;
   line-height: 1.5;
 }
+
+.tile:hover {
+  fill: chocolate;
+}
