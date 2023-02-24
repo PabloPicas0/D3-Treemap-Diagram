@@ -74,6 +74,8 @@ const draw = (data) => {
     .append("rect")
     .on("mousemove", onMouseMove)
     .on("mouseout", onMouseOut)
+    .transition()
+    .duration(750)
     .attr("class", "tile")
     .attr("data-value", (d) => d.data.value)
     .attr("data-name", (d) => d.data.name)
