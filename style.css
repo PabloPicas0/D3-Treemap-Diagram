@@ -26,6 +26,10 @@ header select {
   width: 1720px;
   margin: 10px auto 0px auto;
 }
+#graph #legend {
+  display: block;
+  margin: auto;
+}
 
 #tooltip {
   position: absolute;

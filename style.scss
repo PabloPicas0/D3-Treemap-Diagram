@@ -26,9 +26,13 @@ header {
 }
 
 #graph {
-
     width: 1720px;
     margin: 10px auto 0px auto;
+
+    #legend {
+      display: block;
+      margin: auto;
+    }
 }
 
 #tooltip {

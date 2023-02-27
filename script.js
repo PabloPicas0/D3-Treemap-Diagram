@@ -26,6 +26,44 @@ const container = svg
   .attr("id", "conatiner")
   .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+  const legend = d3.select("#graph").append("svg").attr("id", "legend").attr("width", 500)
+
+  const handleLegend = (data) => { 
+    const colorsRange = [
+      "#1f77b4",
+      "#ff7f0e",
+      "#2ca02c",
+      "#d62728",
+      "#9467bd",
+      "#8c564b",
+      "#e377c2",
+      "#7f7f7f",
+      "#bcbd22",
+      "#17becf",
+      "#9edae5",
+      "#c49c94",
+      "#e377c2",
+      "#c7c7c7",
+      "#ff9896",
+      "#f7b6d2",
+      "#dbdb8d",
+      "#ffbb78",
+      "#aec7e8",
+      "#c5b0d5",
+    ];
+
+    const itemsContainer = legend.selectAll("g").data(data)
+
+    itemsContainer.exit().remove()
+
+    const newContainers = itemsContainer.enter().append("g").attr("class", "container")
+
+    newContainers.append("rect")
+    newContainers.append("text").text(d => d.name)
+
+    itemsContainer.select("text").text(d => d.name)
+  }
+
 //On mouse move method
 const onMouseMove = (event) => {
   const tooltip = d3.select("#tooltip");
@@ -44,57 +82,6 @@ const onMouseOut = () => {
   const tooltip = d3.select("#tooltip");
 
   tooltip.style("opacity", 0);
-};
-
-const draw = (data) => {
-  const hierarchy = d3
-    .hierarchy(data)
-    .sum((d) => {
-      return d.value;
-    })
-    .sort((a, b) => b.value - a.value); //Compute size of each rectangle from given value
-
-  //Create a new tree map
-  const tree = d3.treemap().size([innerWidth, innerHeight]).padding(1);
-
-  //compute position of each element of the hierarchy
-  const root = tree(hierarchy);
-
-  //Create G elements
-  const cell = container
-    .selectAll("g")
-    .data(root.leaves())
-    .enter()
-    .append("g")
-    .attr("class", "cell")
-    .attr("transform", (d) => {
-      return `translate(${d.x0}, ${d.y0})`;
-    });
-
-  //Append rect element to each new G element
-  cell
-    .append("rect")
-    .on("mousemove", onMouseMove)
-    .on("mouseout", onMouseOut)
-    .transition()
-    .duration(750)
-    .attr("class", "tile")
-    .attr("data-value", (d) => d.data.value)
-    .attr("data-name", (d) => d.data.name)
-    .attr("data-category", (d) => d.data.category)
-    .attr("width", (d) => d.x1 - d.x0)
-    .attr("height", (d) => d.y1 - d.y0)
-    .attr("fill", "navy");
-
-  //Append text to each new G element
-  cell
-    .append("text")
-    .attr("fill", "white")
-    .attr("font-size", 10)
-    .style("pointer-events", "none")
-    .attr("x", 5)
-    .attr("y", 10)
-    .html((d) => d.data.name);
 };
 
 const update = (newData) => {
@@ -178,6 +165,8 @@ const update = (newData) => {
     .attr("x", 5)
     .attr("y", 10)
     .html((d) => d.data.name);
+
+    handleLegend(newData.children)
 };
 
 //Simple helper method to don't repeat yourself
@@ -218,7 +207,7 @@ Promise.all([
     }
   });
 
-  draw(games);
+  update(games);
   console.log("KickStart:", kickstarter, "Movies:", movies, "Games:", games);
 });
 
