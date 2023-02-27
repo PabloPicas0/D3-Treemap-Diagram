@@ -38,6 +38,7 @@ const onMouseMove = (event) => {
     .attr("data-value", value)
     .html(`Name: ${name} <br> Category: ${category} <br> Value: ${value}`);
 };
+
 //On mouse out method
 const onMouseOut = () => {
   const tooltip = d3.select("#tooltip");
@@ -108,19 +109,45 @@ const update = (newData) => {
 
   const root = tree(hierarchy);
 
+  //Helpful Source: https://gist.github.com/mbostock/3808218
   const cell = container.selectAll("g").data(root.leaves());
 
   //Exit and remove old values
   cell.exit().remove();
 
-  //Enter
-  const newCells = cell.enter().append("g");
+  //Enter + Update
+  const newCells = cell
+    .enter()
+    .append("g")
+    .attr("class", "cell")
+    .attr("transform", (d) => {
+      return `translate(${d.x0}, ${d.y0})`;
+    });
 
-  newCells.append("rect").transition().duration(750);
+  newCells
+    .append("rect")
+    .on("mousemove", onMouseMove)
+    .on("mouseout", onMouseOut)
+    .transition()
+    .duration(750)
+    .attr("class", "tile")
+    .attr("data-value", (d) => d.data.value)
+    .attr("data-name", (d) => d.data.name)
+    .attr("data-category", (d) => d.data.category)
+    .attr("width", (d) => d.x1 - d.x0)
+    .attr("height", (d) => d.y1 - d.y0)
+    .attr("fill", "navy");
 
-  newCells.append("text");
+  newCells
+    .append("text")
+    .attr("fill", "white")
+    .attr("font-size", 10)
+    .style("pointer-events", "none")
+    .attr("x", 5)
+    .attr("y", 10)
+    .html((d) => d.data.name);
 
-  //Update
+  //Update old element as needed
   cell
     .transition()
     .duration(750)
@@ -166,16 +193,24 @@ Promise.all([
   const [kickstarter, movies, games] = data;
 
   d3.select("#data-diagram").on("change", function () {
-    const value = d3.select(this).property("value"); //Gets the value of option element 
+    const title = d3.select("#title");
+    const description = d3.select("#description");
+    const value = d3.select(this).property("value"); //Gets the value of option element
 
     switch (value) {
       case "Games":
+        title.text("Video Game Sales");
+        description.text("Top 100 Most Sold Video Games Grouped by Platform");
         update(games);
         break;
       case "Movies":
+        title.text("Movie Sales");
+        description.text("Top 100 Highest Grossing Movies Grouped By Genre");
         update(movies);
         break;
       case "Kikckstarter":
+        title.text("Kickstarter Pledges");
+        description.text("Top 100 Most Pledged Kickstarter Campaigns Grouped By Category");
         update(kickstarter);
         break;
       default:
