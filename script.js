@@ -12,65 +12,62 @@ const videoGameSales = {
   link: "https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/video-game-sales-data.json",
 };
 
-//Dimensions and important data
+// Dimensions and important data
 const w = window.screen.availWidth - 200;
 const h = 750;
 const margin = { top: 20, bottom: 20, left: 40, right: 40 };
 const innerWidth = w - margin.left - margin.right;
-const innerHeight = h - margin.top - margin.bottom;
 
-const svg = d3.select("#graph").append("svg").attr("width", w).attr("height", h);
+const svg = d3.select("#graph").append("svg").attr("width", w).attr("height", h)
 
 const container = svg
   .append("g")
   .attr("id", "conatiner")
   .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-  const legend = d3.select("#graph").append("svg").attr("id", "legend").attr("width", 500)
+const legend = d3.select("#graph").append("svg").attr("id", "legend").attr("width", 500);
 
-  //Colors range for legend
-  const colorsRange = [
-    "#1f77b4",
-    "#ff7f0e",
-    "#2ca02c",
-    "#d62728",
-    "#9467bd",
-    "#8c564b",
-    "#e377c2",
-    "#7f7f7f",
-    "#bcbd22",
-    "#17becf",
-    "#9edae5",
-    "#c49c94",
-    "#e377c2",
-    "#c7c7c7",
-    "#ff9896",
-    "#f7b6d2",
-    "#dbdb8d",
-    "#ffbb78",
-    "#aec7e8",
-    "#c5b0d5",
-  ];
+// Colors range for legend
+const colorsRange = [
+  "#1f77b4",
+  "#ff7f0e",
+  "#2ca02c",
+  "#d62728",
+  "#9467bd",
+  "#8c564b",
+  "#e377c2",
+  "#7f7f7f",
+  "#bcbd22",
+  "#17becf",
+  "#9edae5",
+  "#c49c94",
+  "#e377c2",
+  "#c7c7c7",
+  "#ff9896",
+  "#f7b6d2",
+  "#dbdb8d",
+  "#ffbb78",
+  "#aec7e8",
+  "#c5b0d5",
+];
 
-  //Legend scale
-  const color = d3.scaleOrdinal().range(colorsRange)
+// Legend scale
+const color = d3.scaleOrdinal().range(colorsRange);
 
-  const handleLegend = (data) => { 
-    
+const handleLegend = (data) => {
+  const itemsContainer = legend.selectAll("g").data(data);
 
-    const itemsContainer = legend.selectAll("g").data(data)
+  itemsContainer.exit().remove();
 
-    itemsContainer.exit().remove()
+  const newContainers = itemsContainer.enter().append("g").attr("class", "container");
 
-    const newContainers = itemsContainer.enter().append("g").attr("class", "container")
+  newContainers.append("rect");
+  newContainers.append("text").text((d) => d.name);
 
-    newContainers.append("rect")
-    newContainers.append("text").text(d => d.name)
+  itemsContainer.select("text").text((d) => d.name);
+};
 
-    itemsContainer.select("text").text(d => d.name)
-  }
-
-//On mouse move method
+// On mouse move method
 const onMouseMove = (event) => {
   const tooltip = d3.select("#tooltip");
   const { name, category, value } = event.target.__data__.data;
@@ -83,7 +80,7 @@ const onMouseMove = (event) => {
     .html(`Name: ${name} <br> Category: ${category} <br> Value: ${value}`);
 };
 
-//On mouse out method
+// On mouse out method
 const onMouseOut = () => {
   const tooltip = d3.select("#tooltip");
 
@@ -98,17 +95,17 @@ const update = (newData) => {
     })
     .sort((a, b) => b.value - a.value);
 
-  const tree = d3.treemap().size([innerWidth, innerHeight]).padding(1);
+  const tree = d3.treemap().size([innerWidth, h]).padding(1);
 
   const root = tree(hierarchy);
 
-  //Helpful Source: https://gist.github.com/mbostock/3808218
+  // Helpful Source: https://gist.github.com/mbostock/3808218
   const cell = container.selectAll("g").data(root.leaves());
 
-  //Exit and remove old values
+  // Exit and remove old values
   cell.exit().remove();
 
-  //Enter + Update
+  // Enter + Update
   const newCells = cell
     .enter()
     .append("g")
@@ -134,15 +131,18 @@ const update = (newData) => {
     });
 
   newCells
-    .append("text")
-    .attr("fill", "black")
+    .append("text") // append text node for each cell
+    .selectAll("tspan")
+    .data((d) => d.data.name.split(/(?=[A-Z][^A-Z])/g)) // split the name and use that as data to create indiviual tspan elements
+    .enter()
+    .append("tspan") // append tspan node for each element of the string which got split
     .attr("font-size", 10)
     .style("pointer-events", "none")
     .attr("x", 5)
-    .attr("y", 10)
-    .html((d) => d.data.name);
+    .attr("y", (d, i) => 13 + 10 * i) // offset the y positioning with the index of the data
+    .text((d) => d);
 
-  //Update old element as needed
+  // Update old element as needed
   cell
     .transition()
     .duration(750)
@@ -163,23 +163,30 @@ const update = (newData) => {
     .attr("data-category", (d) => d.data.category)
     .attr("width", (d) => d.x1 - d.x0)
     .attr("height", (d) => d.y1 - d.y0)
-    .attr("fill", d => {
+    .attr("fill", (d) => {
       return color(d.data.category);
     });
 
+  // Remove previous text on old element
+  cell.selectAll("tspan").remove();
+
+  // Add new text
   cell
     .select("text")
-    .attr("fill", "black")
+    .selectAll("tspan")
+    .data((d) => d.data.name.split(/(?=[A-Z][^A-Z])/g))
+    .enter()
+    .append("tspan")
     .attr("font-size", 10)
     .style("pointer-events", "none")
     .attr("x", 5)
-    .attr("y", 10)
-    .html((d) => d.data.name);
+    .attr("y", (d, i) => 13 + 10 * i)
+    .text((d) => d);
 
-    handleLegend(newData.children)
+  handleLegend(newData.children);
 };
 
-//Simple helper method to don't repeat yourself
+// Simple helper method to don't repeat yourself
 const response = (response) => {
   return response.json();
 };
@@ -194,7 +201,7 @@ Promise.all([
   d3.select("#data-diagram").on("change", function () {
     const title = d3.select("#title");
     const description = d3.select("#description");
-    const value = d3.select(this).property("value"); //Gets the value of option element
+    const value = d3.select(this).property("value"); // Gets the value of option element
 
     switch (value) {
       case "Games":
@@ -221,6 +228,5 @@ Promise.all([
   console.log("KickStart:", kickstarter, "Movies:", movies, "Games:", games);
 });
 
-//TODO:
-//Add legend
-//Add colored cells
+// TODO:
+// Add legend
