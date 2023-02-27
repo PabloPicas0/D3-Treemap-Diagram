@@ -28,29 +28,35 @@ const container = svg
 
   const legend = d3.select("#graph").append("svg").attr("id", "legend").attr("width", 500)
 
+  //Colors range for legend
+  const colorsRange = [
+    "#1f77b4",
+    "#ff7f0e",
+    "#2ca02c",
+    "#d62728",
+    "#9467bd",
+    "#8c564b",
+    "#e377c2",
+    "#7f7f7f",
+    "#bcbd22",
+    "#17becf",
+    "#9edae5",
+    "#c49c94",
+    "#e377c2",
+    "#c7c7c7",
+    "#ff9896",
+    "#f7b6d2",
+    "#dbdb8d",
+    "#ffbb78",
+    "#aec7e8",
+    "#c5b0d5",
+  ];
+
+  //Legend scale
+  const color = d3.scaleOrdinal().range(colorsRange)
+
   const handleLegend = (data) => { 
-    const colorsRange = [
-      "#1f77b4",
-      "#ff7f0e",
-      "#2ca02c",
-      "#d62728",
-      "#9467bd",
-      "#8c564b",
-      "#e377c2",
-      "#7f7f7f",
-      "#bcbd22",
-      "#17becf",
-      "#9edae5",
-      "#c49c94",
-      "#e377c2",
-      "#c7c7c7",
-      "#ff9896",
-      "#f7b6d2",
-      "#dbdb8d",
-      "#ffbb78",
-      "#aec7e8",
-      "#c5b0d5",
-    ];
+    
 
     const itemsContainer = legend.selectAll("g").data(data)
 
@@ -123,11 +129,13 @@ const update = (newData) => {
     .attr("data-category", (d) => d.data.category)
     .attr("width", (d) => d.x1 - d.x0)
     .attr("height", (d) => d.y1 - d.y0)
-    .attr("fill", "navy");
+    .attr("fill", (d) => {
+      return color(d.data.category);
+    });
 
   newCells
     .append("text")
-    .attr("fill", "white")
+    .attr("fill", "black")
     .attr("font-size", 10)
     .style("pointer-events", "none")
     .attr("x", 5)
@@ -155,11 +163,13 @@ const update = (newData) => {
     .attr("data-category", (d) => d.data.category)
     .attr("width", (d) => d.x1 - d.x0)
     .attr("height", (d) => d.y1 - d.y0)
-    .attr("fill", "navy");
+    .attr("fill", d => {
+      return color(d.data.category);
+    });
 
   cell
     .select("text")
-    .attr("fill", "white")
+    .attr("fill", "black")
     .attr("font-size", 10)
     .style("pointer-events", "none")
     .attr("x", 5)
