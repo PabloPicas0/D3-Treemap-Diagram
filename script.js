@@ -110,8 +110,8 @@ const onMouseMove = (event) => {
   const { name, category, value } = event.target.__data__.data;
 
   tooltip
-    .style("left", `${event.clientX + 10}px`)
-    .style("top", `${event.clientY - 90}px`)
+    .style("left", `${event.pageX + 10}px`)
+    .style("top", `${event.pageY - 90}px`)
     .style("opacity", 0.9)
     .attr("data-value", value)
     .html(`Name: ${name} <br> Category: ${category} <br> Value: ${value}`);
