@@ -72,7 +72,7 @@ const handleLegend = (data) => {
     .append("g")
     .attr("class", "container")
     .attr("transform", (d, i) => {
-      return `translate(${10}, ${i * 20})`;
+      return `translate(${(i % 3) * 150}, ${Math.floor(i / 3) * 25})`;
     });
 
   newContainers
@@ -262,8 +262,4 @@ Promise.all([
   });
 
   update(games);
-  console.log("KickStart:", kickstarter, "Movies:", movies, "Games:", games);
 });
-
-// TODO:
-// Add legend
