@@ -99,9 +99,6 @@ const handleLegend = (data) => {
     .attr("x", 25)
     .attr("y", 15)
     .text((d) => d.name)
-    .text((d) => d.name);
-
-  console.log(data);
 };
 
 // On mouse move method
