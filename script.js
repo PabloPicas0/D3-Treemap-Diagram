@@ -3,22 +3,28 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 const kickstarterPledges = {
+  title: "Kickstarter Pledges",
+  description: "Top 100 Most Pledged Kickstarter Campaigns Grouped By Category",
   link: "https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/kickstarter-funding-data.json",
 };
 const movieSales = {
+  title: "Movie Sales",
+  description: "Top 100 Highest Grossing Movies Grouped By Genre",
   link: "https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/movie-data.json",
 };
 const videoGameSales = {
+  title: "Video Game Sales",
+  description: "Top 100 Most Sold Video Games Grouped by Platform",
   link: "https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/video-game-sales-data.json",
 };
 
 // Dimensions and important data
-const w = window.screen.availWidth - 200;
+const w = window.screen.availWidth - 240;
 const h = 750;
 const margin = { top: 20, bottom: 20, left: 40, right: 40 };
 const innerWidth = w - margin.left - margin.right;
 
-const svg = d3.select("#graph").append("svg").attr("width", w).attr("height", h)
+const svg = d3.select("#graph").append("svg").attr("width", w).attr("height", h);
 
 const container = svg
   .append("g")
@@ -57,14 +63,45 @@ const color = d3.scaleOrdinal().range(colorsRange);
 const handleLegend = (data) => {
   const itemsContainer = legend.selectAll("g").data(data);
 
+  // Exit and remove old values
   itemsContainer.exit().remove();
 
-  const newContainers = itemsContainer.enter().append("g").attr("class", "container");
+  // Enter + Update
+  const newContainers = itemsContainer
+    .enter()
+    .append("g")
+    .attr("class", "container")
+    .attr("transform", (d, i) => {
+      return `translate(${10}, ${i * 20})`;
+    });
 
-  newContainers.append("rect");
-  newContainers.append("text").text((d) => d.name);
+  newContainers
+    .append("rect")
+    .attr("width", 20)
+    .attr("height", 20)
+    .attr("class", "legend-item")
+    .attr("fill", (d) => color(d.name));
+  newContainers
+    .append("text")
+    .attr("x", 25)
+    .attr("y", 15)
+    .text((d) => d.name);
 
-  itemsContainer.select("text").text((d) => d.name);
+  // Update old element as needed
+  itemsContainer
+    .select("rect")
+    .attr("width", 20)
+    .attr("height", 20)
+    .attr("class", "legend-item")
+    .attr("fill", (d) => color(d.name));
+  itemsContainer
+    .select("text")
+    .attr("x", 25)
+    .attr("y", 15)
+    .text((d) => d.name)
+    .text((d) => d.name);
+
+  console.log(data);
 };
 
 // On mouse move method
@@ -99,7 +136,7 @@ const update = (newData) => {
 
   const root = tree(hierarchy);
 
-  // Helpful Source: https://gist.github.com/mbostock/3808218
+  // Helpful Source that describes update cycles in D3: https://gist.github.com/mbostock/3808218
   const cell = container.selectAll("g").data(root.leaves());
 
   // Exit and remove old values
@@ -205,18 +242,18 @@ Promise.all([
 
     switch (value) {
       case "Games":
-        title.text("Video Game Sales");
-        description.text("Top 100 Most Sold Video Games Grouped by Platform");
+        title.text(videoGameSales.title);
+        description.text(videoGameSales.description);
         update(games);
         break;
       case "Movies":
-        title.text("Movie Sales");
-        description.text("Top 100 Highest Grossing Movies Grouped By Genre");
+        title.text(movieSales.title);
+        description.text(movieSales.description);
         update(movies);
         break;
       case "Kikckstarter":
-        title.text("Kickstarter Pledges");
-        description.text("Top 100 Most Pledged Kickstarter Campaigns Grouped By Category");
+        title.text(kickstarterPledges.title);
+        description.text(kickstarterPledges.description);
         update(kickstarter);
         break;
       default:
